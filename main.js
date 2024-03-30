@@ -25,7 +25,7 @@
     }
 
     
-    let np = await nowplaying(5858)
+    let np = await nowplaying(5858) // look for now playing w/ tuna port
     let pollrate = 2000
     let timeout = 100000
     let current = { title: np.data.title }
