@@ -1,0 +1,29 @@
+@font-face {
+    font-family: 'Daydream';
+    src: url('Daydream.woff2') format('woff2'), url('Daydream.woff') format('woff');
+    font-weight: 1;
+    font-style: normal;
+    font-display: swap;
+}
+
+html,
+body#stage {
+    height: 720px;
+    width: 1280px;
+    margin: 0;
+    background: transparent;
+}
+
+span {
+    font-family: 'Daydream';
+    text-shadow: 4px 4px 4px #000000;
+    color: white
+}
+
+span.tuna-title {
+    font-size: 3rem;
+}
+
+span.tuna-artist {
+    font-size: 2rem;
+}
