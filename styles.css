@@ -6,12 +6,27 @@
     font-display: swap;
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 html,
-body#stage {
-    height: 720px;
-    width: 1280px;
+body {
+    padding: 0;
     margin: 0;
     background: transparent;
+}
+
+div.stage {
+    transition: all ease-in-out 1500;
+    opacity: 0;
+}
+
+div.stage.visible {
+    transition: all ease-in-out 1500;
+    opacity: 1
 }
 
 span {
