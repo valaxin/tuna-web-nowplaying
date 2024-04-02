@@ -1,56 +1,87 @@
 (async () => {
+  /* states: 0 = uninitalized, 1 = initalized, 2 = error  */
 
-    // get data ?
+  const PORT = `5858`;
+  const ENDPOINT = `http://localhost:${PORT}/`;
+  const CACHE = { ENDPOINT, STATE: 0, LOG: [] };
+  const RATE = 3200;
 
-    'use strict'
-    
-    const nowplaying = async (port) => {
-
-        const populate = async (data) => {
-            const stage = document.body.querySelector('div.stage')
-            stage.innerHTML = `<div class="tuna-wrapper"><span class="tuna-title">${data.title}</span></br><span class="tuna-artist">${data.artists[0]}</span></div>`
-            return stage
-        }
-
-        try {
-            const endpoint = `http://127.0.0.1:${!port ? '1609' : port}/`
-            const req = await fetch (endpoint, { method: 'GET' })
-            const data = await req.json()
-            const markup = await populate(data)
-            return { data, markup}
-        } catch (err) {
-            throw err
-        }
-        
+  // request the data presented at defined address:port by tuna obs plugin
+  // expected data type is json.
+  async function requestCurrentSong(url, options) {
+    try {
+      let response = await fetch(url, options);
+      let jsondata = await response.json();
+      return jsondata;
+    } catch (error) {
+      throw error;
     }
+  }
 
-    // call the titles in onces, initalize them if you will...
-    // 
-    
-    const pollrate = 2000
-    let np = await nowplaying(5858) // look for now playing w/ tuna port
-    
-    let current = { title: np.data.title, timeout: Number(Math.floor(np.data.duration / 4)) } // set
-    
-    np.markup.classList.add('visible')
+  // initlize "CACHE" object by setting data "as is" into the object.
+  async function setIntoCache(object, data) {
+    console.log([
+      `Congrats! "object.STATE" exists and is set to 0=uninialized or 1=initalized state.`,
+      (typeof object.STATE === "number" && object.STATE === 0) ||
+        object.STATE === 1,
+    ]);
 
-    await setInterval(async () => {
-        
-        np = await nowplaying(5858)
-        
-        if (np.data.title != current.title) {
-            
-            console.log(`${current.title} => ${np.data.title}`)
+    // proceed...
+    if (
+      (typeof object.STATE === "number" && object.STATE === 0) ||
+      object.STATE === 1
+    ) {
+      // setup or we're already running... prepend via splice the current song to the "history" array returning the updated cache,
+      // > preform .map() on array on invocation ensuring that index 0 isn't dupulicate to current song without a finished timestamp/tag appended.
+      // timestamp is applied only when new data is present. (this might have issues when a song is repeated unsure tho.)
+      // ---
+      // if the data isn't the same as the current index 0 insert data into array
 
-            current = { title: np.data.title, timeout: Number(Math.floor(np.data.duration / 3)) } // update
-            np.markup.classList.add('visible') // give class back
-            
-            console.log(`${current.timeout}ms until elements hide`)
+      // either there isn't a value at index 0 (undefined) or its some object notation. set or replcae the data
 
-            setTimeout(() => {
-                np.markup.classList.remove('visible')
-            }, current.timeout)
+      console.log(`now playing "${data.title}" by "${data.artists[0]}"`);
+
+      if (object.LOG[0] === undefined) {
+        object.LOG.splice(0, 0, data);
+        object.STATE = 1;
+      }
+
+      // let's harden this check, by making use of the provided track url from spotify
+      const getSpotifyTrackID = (source) => {
+        try {
+          return source.url.split("/")[source.url.split("/").length - 1];
+        } catch (error) {
+          return error;
         }
-    }, pollrate)
+      };
 
-})()
+      // compare previouly mentioned ids, and prepend to log if change present.
+      if (object.LOG[0].title) {
+        if (getSpotifyTrackID(object.LOG[0]) !== getSpotifyTrackID(data)) {
+          console.log(
+            `Hey buddy! Data says the song changed, let's get this switched up!`
+          );
+          object.LOG[0].finished = true;
+          object.LOG.splice(0, 0, data);
+        }
+      }
+      return object;
+    } else {
+        // return error
+      object.STATE = 2;
+      return {
+        object,
+        errorMessage: `Uh-Oh! "object.STATE" doesn't exist check what you're passing into "setIntoCache()"`,
+      };
+    }
+  }
+
+  async function main() {
+    setInterval(async () => {
+      let jsondata = await requestCurrentSong(ENDPOINT, { Method: "GET" });
+      let cache = await setIntoCache(CACHE, jsondata);
+    }, RATE);
+  }
+
+  main();
+})();

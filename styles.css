@@ -10,35 +10,7 @@
 *::before,
 *::after {
     box-sizing: border-box;
-}
-
-html,
-body {
-    padding: 0;
     margin: 0;
-    background: transparent;
-}
+    padding: 0;
 
-div.stage {
-    transition: all ease-in-out 1500;
-    opacity: 0;
-}
-
-div.stage.visible {
-    transition: all ease-in-out 1500;
-    opacity: 1
-}
-
-span {
-    font-family: 'Daydream';
-    text-shadow: 4px 4px 4px #000000;
-    color: white
-}
-
-span.tuna-title {
-    font-size: 3rem;
-}
-
-span.tuna-artist {
-    font-size: 2rem;
 }
