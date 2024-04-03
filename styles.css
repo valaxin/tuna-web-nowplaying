@@ -7,6 +7,22 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "RetroThing";
+  src: url("/fonts/RetroThing.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "RetroComputer";
+  src: url("/fonts/RetroComputer.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -22,7 +38,8 @@ body {
 .stage {
   font-family: "Daydream";
   text-shadow: 4px 4px 0px #000000;
-  margin: 50px 50px;
+  margin: 35vh 0 0 0;
+  padding-left: 70px;
   font-size: 2.5rem;
   color: white;
 }
@@ -39,6 +56,9 @@ body {
 
 .song-artist {
   font-size: 1.5rem;
+  line-height: 1rem;
   padding-top: -25px;
+  font-family: 'RetroComputer';
   animation: 1s wave backwards ease-in-out infinite;
+  text-transform: capitalize;
 }
