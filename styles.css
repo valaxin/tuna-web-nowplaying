@@ -1,16 +1,44 @@
 @font-face {
-    font-family: 'Daydream';
-    src: url('Daydream.woff2') format('woff2'), url('Daydream.woff') format('woff');
-    font-weight: 1;
-    font-style: normal;
-    font-display: swap;
+  font-family: "Daydream";
+  src: url("/fonts/Daydream.woff2") format("woff2"),
+    url("/fonts/Daydream.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
+body {
+  background: transparent;
+}
+
+.stage {
+  font-family: "Daydream";
+  text-shadow: 4px 4px 0px #000000;
+  margin: 50px 50px;
+  font-size: 2.5rem;
+  color: white;
+}
+
+.information-container {
+  transition: all 2000ms ease-in-out;
+  opacity: 1;
+}
+
+.information-container.hidden {
+  transition: all 2000ms ease-in-out;
+  opacity: 0;
+}
+
+.song-artist {
+  font-size: 1.5rem;
+  padding-top: -25px;
+  animation: 1s wave backwards ease-in-out infinite;
 }
