@@ -8,7 +8,6 @@ This application expects that you've installed and setup the [Tuna](https://git.
 
 ## Installing & Running Locally
 
-
 1. Open Obs64.exe
 2. Clone Project and navigate to it's directory within your shell enviroment.
 3. Ensure the `HOSTIP` and `HOSTPORT` variables within `/main.js` are set for your envrioment.
