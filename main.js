@@ -3,6 +3,8 @@
 
   /* states: 0 = uninitalized, 1 = initalized, 2 = error  */
 
+  
+
   const PORT = `5858`;
   const ENDPOINT = `http://localhost:${PORT}/`;
   const CACHE = { ENDPOINT, STATE: 0, LOG: [] };
