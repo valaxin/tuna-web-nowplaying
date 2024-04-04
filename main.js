@@ -1,35 +1,84 @@
 (async () => {
   "use strict";
 
-  /* states: 0 = uninitalized, 1 = initalized, 2 = error  */
+  /* states: 0 = uninitalized, 1 = initalized, 2 = error */
 
-  
+  const config = {
+    rtic: 0,
+    port: "9002",
+    host: "0.0.0.0",
+    rate: 2000,
+    tmot: 60000,
+    selc: [".stage", ".information-container", ".song-title", ".song-artists"],
+  };
 
-  const PORT = `5858`;
-  const ENDPOINT = `http://localhost:${PORT}/`;
-  const CACHE = { ENDPOINT, STATE: 0, LOG: [] };
-  const RATE = 2000;
-  const TIMEOUT = 60000; // 1 minute
-  const SELECTORS = [
-    ".stage",
-    ".information-container",
-    ".song-title",
-    ".song-artist",
-  ];
+  const state = [0, { history: [] }];
 
-  let tick = 0;
-
-  const getCurrentTrackInfo = async (url, options) => {
+  // send request to address with passed or default options
+  // expects a json response that is returned on promise resolve.
+  async function CurrentSong(address, options) {
+    let defaultOptions = {
+      cache: "no-cache",
+      redirect: "error",
+      method: "GET",
+      mode: "cors",
+    };
     try {
-      let response = await fetch(url, options || { Method: "GET" });
+      let response = await fetch(address, options || defaultOptions);
       let jsondata = await response.json();
       return jsondata;
     } catch (error) {
       throw error;
     }
-  };
+  }
 
-  const getSpotifyTrackID = (source) => {
+  //
+  async function SimpleStateManagement(state, updates, timeout) {
+    let history = state[1].history;
+
+    try {
+      // create first entry into history array should it not exist
+      if (typeof history[0] === "undefined") {
+        history.splice(0, 0, updates);
+        state[0] = 1;
+      }
+
+      // if the current data and the last saved song don't match
+      if (SpotifyTrackUUID(history[0]) !== SpotifyTrackUUID(updates)) {
+        history[0].finished = true;
+        history.splice(0, 0, updates);
+
+        console.info(
+          `[Song Changed] - "${history[0].title}" - "${
+            history[0].artists[0]
+          }" \nVisit: ${history[0].url} \n Information displayed will hide in ${
+            timeout / 1000
+          } seconds.`, 
+          state
+        );
+      }
+
+      // when the song progress has supassed or not
+      // the timeout value (ms) set the flag accordingly
+      if (updates.progress > timeout) {
+        history[0].visible = false;
+      } else {
+        history[0].visible = true;
+      }
+
+      if (history[0].progress === updates.progress) {
+        console.log('[Paused?]')
+      }
+
+    } catch (error) {
+      state[0] = 2;
+      throw error;
+    }
+    return history;
+  }
+
+  // parse the Spotify track url from data source returning ONLY the track ID.
+  const SpotifyTrackUUID = (source) => {
     try {
       return source.url.split("/")[source.url.split("/").length - 1];
     } catch (error) {
@@ -37,36 +86,14 @@
     }
   };
 
-  const simpleCacheChecking = async (saved, incoming) => {
-    if (typeof saved.LOG[0] === "undefined") {
-      saved.LOG.splice(0, 0, incoming);
-      saved.LOG[0].timeout = saved.LOG[0].duration - TIMEOUT;
-      saved.STATE = 1;
-    } else {
-      if (getSpotifyTrackID(saved.LOG[0]) !== getSpotifyTrackID(incoming)) {
-        saved.LOG[0].finished = true;
-        saved.LOG.splice(0, 0, incoming);
-        saved.LOG[0].timeout = saved.LOG[0].duration - TIMEOUT;
-        console.info(
-          `Song Changed "${incoming.title}" - "${incoming.artists[0]}" \nVisit: ${incoming.url}`,
-          `\n Information hiding in about ${Math.floor(
-            saved.LOG[0].timeout / 1000
-          )}Seconds`
-        );
-      }
-      if (incoming.progress > saved.LOG[0].timeout) {
-        saved.LOG[0].hide = true;
-      } else {
-        saved.LOG[0].hide = false;
-      }
+  // using a provided selector, insert provided data into elements then into the DOM.
+  const InsertPopulatedElements = (selector, data) => {
+    if (typeof selector === "string" && selector.length > 0) {
+      // console.log("selector exists", selector, selector.length);
     }
-    return saved;
-  };
-
-  const insertIntoDOM = async (selector, data) => {
     let hook = document.querySelector(selector);
     hook.innerHTML = `
-      <div class="information-container ${data.hide === true ? "hidden" : ""}">
+      <div class="information-container ${data.visible === false ? "hidden" : ""}">
         <span class="animated-text wave song-title">${data.title}</span>
         </br>
         <span class="animated-text wave song-artist">${data.artists[0]}</span>
@@ -74,17 +101,13 @@
     `;
     return hook.children[0];
   };
+  
+  // call these functions on rated interval, incriment on completetion
+  const ExecuteOnInterval = setInterval(async () => {
+    const fresh = await CurrentSong(`http://${config.host}:${config.port}`)
+    const smtmp = await SimpleStateManagement(state, fresh, config.tmot)
+    const elems = await InsertPopulatedElements(config.selc[0], state[1].history[0])
+    config.rtic++
+  }, config.rate) 
 
-  async function init() {
-    setInterval(async () => {
-      const DATA = await getCurrentTrackInfo(ENDPOINT);
-      const TEMP = await simpleCacheChecking(CACHE, DATA);
-      const ELEM = await insertIntoDOM(SELECTORS[0], CACHE.LOG[0]);
-      console.log(
-        `elapsed over remaining before hidden class is added :: ${DATA.progress} / ${CACHE.LOG[0].timeout}`
-      );
-    }, RATE);
-  }
-
-  await init();
 })();
