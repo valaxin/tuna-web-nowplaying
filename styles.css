@@ -1,23 +1,23 @@
 @font-face {
-  font-family: "Daydream";
-  src: url("/fonts/Daydream.woff2") format("woff2"),
-    url("/fonts/Daydream.woff") format("woff");
+  font-family: "daydream";
+  src: url("/fonts/daydream.woff2") format("woff2"),
+       url("/fonts/daydream.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "RetroThing";
-  src: url("/fonts/RetroThing.woff") format("woff");
+  font-family: "vcr-jp";
+  src: url("/fonts/vcr-jp.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "RetroComputer";
-  src: url("/fonts/RetroComputer.woff") format("woff");
+  font-family: "phonixea";
+  src: url("/fonts/phonixea.woff") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -31,36 +31,46 @@
   padding: 0;
 }
 
+html,
 body {
   background: transparent;
 }
 
 .stage {
-  font-family: "Daydream";
-  text-shadow: 4px 4px 0px #000000;
-  margin: 35vh 0 0 0;
-  padding-left: 70px;
-  font-size: 2.5rem;
-  color: white;
   position: relative;
-  top: 33vh;
+  top: 0;
+  left: 0;
+  height: 720px;
+  width: 1280px;
 }
 
 .information-container {
-  transition: all 2000ms ease-in-out;
   opacity: 1;
+  position: absolute;
+  bottom: 14%;
+  left: 8%;
+  max-width: calc(1280px - 16%);
 }
-
 .information-container.hidden {
-  transition: all 2000ms ease-in-out;
   opacity: 0;
 }
 
-.song-artist {
-  font-size: 1.5rem;
-  line-height: 1rem;
-  padding-top: -25px;
-  font-family: 'RetroComputer';
-  animation: 1s wave backwards ease-in-out infinite;
-  text-transform: capitalize;
+.song-artwork {
+  float: left;
+  height: 64px;
+  width: 64px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.song-title {
+  font-size: 1.75rem;
+  font-family: 'daydream';
+  font-weight: bold;
+}
+
+.song-artist,
+.song-album {
+  font-size: 1rem;
+  font-family: 'vcr-jp';
 }

@@ -6,9 +6,9 @@
   const config = {
     rtic: 0,
     port: "9002",
-    host: "0.0.0.0",
+    host: "127.0.0.1",
     rate: 2000,
-    tmot: 60000,
+    tmot: 90000,
     selc: [".stage", ".information-container", ".song-title", ".song-artists"],
   };
 
@@ -96,11 +96,24 @@
       <div class="information-container ${data.visible === false ? "hidden" : ""}">
         <span class="animated-text wave song-title">${data.title}</span>
         </br>
-        <span class="animated-text wave song-artist">${data.artists[0]}</span>
+        <span class="animated-text wave song-artist">${ConcatenateArtistsNames(data.artists)}</span>
+        </br>
+        <!-- <span class="animated-text wave song-album">${data.album}, (${data.release_year})</span> -->
       </div>
     `;
     return hook.children[0];
   };
+
+  const ConcatenateArtistsNames = (artists) => {
+    return artists.join(', ')
+  }
+
+  async function RequestQRCode (size, data) {
+    let url = `api.qrserver.com/v1/create-qr-code`
+    let address = `https://${uri}?size=${size}x${size}&data="${encodeURI(data)}"`
+    let response = await fetch (address, { method: 'GET' })
+    return await response.blob()
+  }
   
   // call these functions on rated interval, incriment on completetion
   const ExecuteOnInterval = setInterval(async () => {
@@ -108,6 +121,6 @@
     const smtmp = await SimpleStateManagement(state, fresh, config.tmot)
     const elems = await InsertPopulatedElements(config.selc[0], state[1].history[0])
     config.rtic++
-  }, config.rate) 
+  }, config.rate)
 
 })();
