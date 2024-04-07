@@ -8,7 +8,7 @@
     port: "9002",
     host: "127.0.0.1",
     rate: 2000,
-    tmot: 90000,
+    tmot: 45000,
     selc: [".stage", ".information-container", ".song-title", ".song-artists"],
   };
 
